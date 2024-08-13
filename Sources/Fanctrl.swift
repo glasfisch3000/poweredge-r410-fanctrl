@@ -6,7 +6,9 @@ public struct Fanctrl: AsyncParsableCommand {
         commandName: "fanctrl",
         version: "0.0.0",
         shouldDisplay: true,
+        subcommands: [SetFans.self],
         groupedSubcommands: [],
+        defaultSubcommand: SetFans.self,
         aliases: []
     )
     
