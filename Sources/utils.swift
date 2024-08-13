@@ -96,7 +96,7 @@ internal func shell(cmd: String, args: [String] = [], on eventLoop: EventLoop) t
     
     task.standardOutput = stdout
     task.standardError = stderr
-    task.executableURL = URL(filePath: "/usr/bin/env")
+    task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     task.arguments = [cmd] + args
     task.qualityOfService = .userInitiated
     
