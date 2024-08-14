@@ -20,12 +20,19 @@ public struct SetFans: AsyncParsableCommand {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let eventLoop = eventLoopGroup.next()
         
-        switch fanMode {
-        case .manual(let percentage):
-            try await fans_setManualMode(true, on: eventLoop)
-            try await fans_setValue(percentage, on: eventLoop)
-        case .automatic:
-            try await fans_setManualMode(false, on: eventLoop)
+        do {
+            switch fanMode {
+            case .manual(let percentage):
+                try await fans_setManualMode(true, on: eventLoop)
+                try await fans_setValue(percentage, on: eventLoop)
+            case .automatic:
+                try await fans_setManualMode(false, on: eventLoop)
+            }
+        } catch let error as ShellCommandFailure {
+            if let stderr = error.stderr {
+                print(stderr, to: &standardError)
+            }
+            throw error
         }
     }
 }
