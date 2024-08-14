@@ -8,7 +8,6 @@ public struct Fanctrl: AsyncParsableCommand {
         shouldDisplay: true,
         subcommands: [SetFans.self],
         groupedSubcommands: [],
-        defaultSubcommand: SetFans.self,
         aliases: []
     )
     

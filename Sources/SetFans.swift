@@ -5,7 +5,7 @@ public struct SetFans: AsyncParsableCommand {
     public static var configuration = CommandConfiguration(
         commandName: "setfans",
         abstract: "Set the overall fan usage",
-        version: "0.0.0",
+        version: "1.0.0",
         shouldDisplay: true,
         subcommands: [],
         groupedSubcommands: [],
