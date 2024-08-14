@@ -37,7 +37,7 @@ public enum FanMode: ExpressibleByArgument {
         case "off": self = .manual(percentage: 0)
         case "full": self = .manual(percentage: 100)
         default:
-            guard let match = argument.wholeMatch(of: /(?<percentage>[0-9]+)%|(?<float>[0-9]*\.?[0-9]+)/) else {
+            guard let match = argument.wholeMatch(of: /(?<percentage>[0-9]+)%|(?<float>[0-9]*\.[0-9]+)/) else {
                 return nil
             }
             
