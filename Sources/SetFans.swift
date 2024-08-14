@@ -36,35 +36,34 @@ public enum FanMode: ExpressibleByArgument {
         case "auto", "automatic": self = .automatic
         case "off": self = .manual(percentage: 0)
         case "full": self = .manual(percentage: 100)
-        default: break
-        }
-        
-        guard let match = argument.wholeMatch(of: /(?<percentage>[0-9]+)%|(?<float>[0-9]*.?[0-9]+)/) else {
-            return nil
-        }
-        
-        if let percentage = match.output.percentage {
-            guard let parsed = UInt8(percentage) else {
+        default:
+            guard let match = argument.wholeMatch(of: /(?<percentage>[0-9]+)%|(?<float>[0-9]*\.?[0-9]+)/) else {
                 return nil
             }
             
-            self = switch parsed {
-            case 0...100: .manual(percentage: parsed)
-            default: .manual(percentage: 100)
-            }
-        } else if let float = match.output.float {
-            guard let parsed = Double(float) else {
+            if let percentage = match.output.percentage {
+                guard let parsed = UInt8(percentage) else {
+                    return nil
+                }
+                
+                self = switch parsed {
+                case 0...100: .manual(percentage: parsed)
+                default: .manual(percentage: 100)
+                }
+            } else if let float = match.output.float {
+                guard let parsed = Double(float) else {
+                    return nil
+                }
+                
+                switch parsed {
+                case 0...1: self = .manual(percentage: UInt8((parsed * 100).rounded()))
+                case ..<0: self = .manual(percentage: 0)
+                case 1...: self = .manual(percentage: 100)
+                default: return nil
+                }
+            } else {
                 return nil
             }
-            
-            switch parsed {
-            case 0...1: self = .manual(percentage: UInt8((parsed * 100).rounded()))
-            case ..<0: self = .manual(percentage: 0)
-            case 1...: self = .manual(percentage: 100)
-            default: return nil
-            }
-        } else {
-            return nil
         }
     }
     
