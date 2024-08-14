@@ -89,7 +89,7 @@ internal struct ShellCommandFailure: Error, CustomStringConvertible {
     var description: String { "shell command failed with exit code \(exitCode)" + (uncaughtSignal ? " (uncaught signal)" : "") }
 }
 
-internal func shell(cmd: String, args: [String] = [], on eventLoop: EventLoop) throws -> ShellCommand {
+internal func shell(cmd: String, args: [String] = [], sudo: Bool = false, on eventLoop: EventLoop) throws -> ShellCommand {
     let task = Process()
     let stdout = Pipe()
     let stderr = Pipe()
@@ -97,7 +97,7 @@ internal func shell(cmd: String, args: [String] = [], on eventLoop: EventLoop) t
     task.standardOutput = stdout
     task.standardError = stderr
     task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-    task.arguments = [cmd] + args
+    task.arguments = (sudo ? ["/usr/bin/sudo", "--non-interactive", "--"] : []) + [cmd] + args
     task.qualityOfService = .userInitiated
     
     let promise = eventLoop.makePromise(of: ShellCommandResult.self)
@@ -121,5 +121,5 @@ internal func shell(cmd: String, args: [String] = [], on eventLoop: EventLoop) t
 }
 
 internal func ipmitool_executeCommand(subcmd: String, args: [String], on eventLoop: EventLoop) throws -> ShellCommand {
-    try shell(cmd: "/usr/local/bin/ipmitool", args: [subcmd] + args, on: eventLoop)
+    try shell(cmd: "/usr/local/bin/ipmitool", args: [subcmd] + args, sudo: true, on: eventLoop)
 }
