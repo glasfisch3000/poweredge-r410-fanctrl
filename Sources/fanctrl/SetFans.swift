@@ -22,6 +22,7 @@ public struct SetFans: AsyncParsableCommand {
     public mutating func run() async throws {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let eventLoop = eventLoopGroup.next()
+        defer { try? eventLoopGroup.syncShutdownGracefully() }
         
         do {
             switch fanMode {
