@@ -10,6 +10,8 @@ public struct SetFans: AsyncParsableCommand {
         shouldDisplay: true,
         subcommands: [],
         groupedSubcommands: [],
+        defaultSubcommand: nil,
+        helpNames: .shortAndLong,
         aliases: ["set"]
     )
     
