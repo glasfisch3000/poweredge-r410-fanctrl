@@ -1,5 +1,6 @@
 import NIOPosix
 import ArgumentParser
+import IPMITool
 
 public struct SetFans: AsyncParsableCommand {
     public static var configuration = CommandConfiguration(

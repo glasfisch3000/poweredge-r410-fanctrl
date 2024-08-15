@@ -1,33 +1,33 @@
 import Foundation
 import NIOCore
 
-internal struct ShellCommand {
+public struct ShellCommand {
     private var task: Process
     
-    init(task: Process, result: EventLoopFuture<ShellCommandResult>) {
+    internal init(task: Process, result: EventLoopFuture<ShellCommandResult>) {
         self.task = task
         self.result = result
     }
     
-    var result: EventLoopFuture<ShellCommandResult>
+    public var result: EventLoopFuture<ShellCommandResult>
     
-    var processID: Int32 { task.processIdentifier }
-    var isRunning: Bool { task.isRunning }
+    public var processID: Int32 { task.processIdentifier }
+    public var isRunning: Bool { task.isRunning }
 }
 
-internal struct ShellCommandResult {
-    var stdout: Data?
-    var stderr: Data?
-    var code: Int32
-    var terminationReason: Process.TerminationReason
+public struct ShellCommandResult {
+    public var stdout: Data?
+    public var stderr: Data?
+    public var code: Int32
+    public var terminationReason: Process.TerminationReason
     
-    func stdoutString(_ encoding: String.Encoding) -> String? {
+    public func stdoutString(_ encoding: String.Encoding) -> String? {
         if let stdout = stdout {
             String(data: stdout, encoding: encoding)
         } else { nil }
     }
     
-    func stdoutString() throws -> String? {
+    public func stdoutString() throws -> String? {
         guard let stdout = stdout else { return nil }
         
         if let string = String(data: stdout, encoding: .utf8) { return string }
@@ -39,13 +39,13 @@ internal struct ShellCommandResult {
         throw ShellError.unableToReadStdout
     }
     
-    func stderrString(_ encoding: String.Encoding) -> String? {
+    public func stderrString(_ encoding: String.Encoding) -> String? {
         if let stderr = stderr {
             String(data: stderr, encoding: encoding)
         } else { nil }
     }
     
-    func stderrString() throws -> String? {
+    public func stderrString() throws -> String? {
         guard let stderr = stderr else { return nil }
         
         if let string = String(data: stderr, encoding: .utf8) { return string }
@@ -57,7 +57,7 @@ internal struct ShellCommandResult {
         throw ShellError.unableToReadStderr
     }
     
-    func validate() -> Result<ShellCommandResult, ShellCommandFailure> {
+    public func validate() -> Result<ShellCommandResult, ShellCommandFailure> {
         if self.code == 0 && self.terminationReason == .exit {
             return .success(self)
         } else {
@@ -69,13 +69,13 @@ internal struct ShellCommandResult {
     }
 }
 
-internal enum ShellError: Error, CustomStringConvertible {
+public enum ShellError: Error, CustomStringConvertible {
     case missingStdout
     case missingStderr
     case unableToReadStdout
     case unableToReadStderr
     
-    var description: String {
+    public var description: String {
         switch self {
         case .missingStdout: "shell command failed: missing stdout"
         case .missingStderr: "shell command failed: missing stderr"
@@ -85,16 +85,16 @@ internal enum ShellError: Error, CustomStringConvertible {
     }
 }
 
-internal struct ShellCommandFailure: Error, CustomStringConvertible {
-    var stdout: String?
-    var stderr: String?
-    var exitCode: Int32
-    var uncaughtSignal: Bool
+public struct ShellCommandFailure: Error, CustomStringConvertible {
+    public var stdout: String?
+    public var stderr: String?
+    public var exitCode: Int32
+    public var uncaughtSignal: Bool
     
-    var description: String { "shell command failed with exit code \(exitCode)" + (uncaughtSignal ? " (uncaught signal)" : "") }
+    public var description: String { "shell command failed with exit code \(exitCode)" + (uncaughtSignal ? " (uncaught signal)" : "") }
 }
 
-internal func shell(cmd: String, args: [String] = [], sudo: Bool = false, on eventLoop: EventLoop) throws -> ShellCommand {
+public func shell(cmd: String, args: [String] = [], sudo: Bool = false, on eventLoop: EventLoop) throws -> ShellCommand {
     let task = Process()
     let stdout = Pipe()
     let stderr = Pipe()
@@ -125,6 +125,6 @@ internal func shell(cmd: String, args: [String] = [], sudo: Bool = false, on eve
     return ShellCommand(task: task, result: promise.futureResult)
 }
 
-internal func ipmitool_executeCommand(subcmd: String, args: [String], on eventLoop: EventLoop) throws -> ShellCommand {
+public func ipmitool_executeCommand(subcmd: String, args: [String], on eventLoop: EventLoop) throws -> ShellCommand {
     try shell(cmd: "/usr/local/bin/ipmitool", args: [subcmd] + args, sudo: true, on: eventLoop)
 }
