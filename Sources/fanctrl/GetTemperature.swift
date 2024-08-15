@@ -42,7 +42,7 @@ public struct GetTemperature: AsyncParsableCommand {
             Self.knownSensors
         }
         
-        let tasks = sensors.map { sensorID, sensorName in
+        let tasks = sensors.sorted(by: { $0.key < $1.key }).map { sensorID, sensorName in
             let task = Task {
                 try await sensor_read(sensorID, on: eventLoopGroup.next()).temperatureReading()
             }
@@ -51,9 +51,9 @@ public struct GetTemperature: AsyncParsableCommand {
         
         for (sensorID, sensorName, task) in tasks {
             let header = if let sensorName = sensorName {
-                "0x\(String(sensorID, radix: 16)) (\(sensorName)):"
+                "0x\(String(format: "%02X", sensorID)) (\(sensorName)):"
             } else {
-                "0x\(String(sensorID, radix: 16)):"
+                "0x\(String(format: "%02X", sensorID)):"
             }
             
             let value = switch await task.result {
