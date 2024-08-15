@@ -30,7 +30,7 @@ public struct GetTemperature: AsyncParsableCommand {
             throw ValidationError("invalid sensor ID: \"(input)\"")
         }
         return sensorID
-    }) public var sensorIDs: [UInt8]
+    }) public var sensorIDs: [UInt8] = []
     
     public mutating func run() async throws {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
