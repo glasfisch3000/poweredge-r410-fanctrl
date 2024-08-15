@@ -51,7 +51,7 @@ public func sensor_read(_ sensorID: UInt8, on eventLoop: EventLoop) async throws
         throw ShellError.missingStdout
     }
     
-    guard let match = result.wholeMatch(of: /\s*(?<reading>[A-Fa-f0-9]{2}) (?<state>[A-Fa-f0-9]{2}) (?<thresholds>[A-Fa-f0-9]{2})? [A-Fa-f0-9]{2}?\s*/),
+    guard let match = result.wholeMatch(of: /\s*(?<reading>[A-Fa-f0-9]{2})\s+(?<state>[A-Fa-f0-9]{2})(\s+(?<thresholds>[A-Fa-f0-9]{2})(\s+[A-Fa-f0-9]{2})?)?\s*/),
           let readingRaw = UInt8(match.output.reading, radix: 16),
           let stateRaw = UInt8(match.output.state, radix: 16) else {
         throw SensorReadError.invalidIPMIResponse
