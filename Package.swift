@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.70.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.76.0"),
     ],
     targets: [
         .executableTarget(
@@ -32,8 +32,3 @@ let package = Package(
         ),
     ]
 )
-
-for target in package.targets {
-    target.swiftSettings = target.swiftSettings ?? []
-    target.swiftSettings?.append(.enableUpcomingFeature("BareSlashRegexLiterals"))
-}

@@ -1,4 +1,4 @@
-public struct SensorState: Hashable, Codable {
+public struct SensorState: Hashable, Sendable, Codable {
     public var eventMessagesEnabled: Bool
     public var valueScanningEnabled: Bool
     

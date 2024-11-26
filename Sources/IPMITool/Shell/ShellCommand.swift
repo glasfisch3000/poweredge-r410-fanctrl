@@ -1,7 +1,7 @@
 import Foundation
 import NIOCore
 
-public struct ShellCommand {
+public struct ShellCommand: Sendable {
     private var task: Process
     
     internal init(task: Process, result: EventLoopFuture<ShellCommandResult>) {

@@ -3,7 +3,7 @@ import ArgumentParser
 import IPMITool
 
 public struct SetFans: AsyncParsableCommand {
-    public static var configuration = CommandConfiguration(
+    public static let configuration = CommandConfiguration(
         commandName: "setfans",
         abstract: "Set the overall fan usage.",
         version: "1.0.0",
@@ -22,7 +22,12 @@ public struct SetFans: AsyncParsableCommand {
     public mutating func run() async throws {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let eventLoop = eventLoopGroup.next()
-        defer { try? eventLoopGroup.syncShutdownGracefully() }
+        defer {
+            eventLoopGroup.shutdownGracefully { error in
+                // if an error occurs, print it
+                error.flatMap { print($0, to: &standardError) }
+            }
+        }
         
         do {
             switch fanMode {
@@ -41,7 +46,7 @@ public struct SetFans: AsyncParsableCommand {
     }
 }
 
-public enum FanMode: ExpressibleByArgument {
+public enum FanMode: Sendable, ExpressibleByArgument {
     public init?(argument: String) {
         switch argument {
         case "auto", "automatic": self = .automatic

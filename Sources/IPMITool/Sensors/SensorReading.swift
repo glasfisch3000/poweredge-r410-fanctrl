@@ -1,4 +1,4 @@
-public struct SensorReading: Hashable, Codable {
+public struct SensorReading: Hashable, Sendable, Codable {
     public var state: SensorState
     public var reading: UInt8?
 }

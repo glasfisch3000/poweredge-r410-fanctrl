@@ -1,4 +1,4 @@
-public enum ShellError: Error, CustomStringConvertible {
+public enum ShellError: Error, Sendable, CustomStringConvertible {
     case missingStdout
     case missingStderr
     case unableToReadStdout
@@ -14,7 +14,7 @@ public enum ShellError: Error, CustomStringConvertible {
     }
 }
 
-public struct ShellCommandFailure: Error, CustomStringConvertible {
+public struct ShellCommandFailure: Error, Sendable, CustomStringConvertible {
     public var stdout: String?
     public var stderr: String?
     public var exitCode: Int32

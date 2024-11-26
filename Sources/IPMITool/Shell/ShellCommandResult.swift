@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ShellCommandResult {
+public struct ShellCommandResult: Sendable {
     public var stdout: Data?
     public var stderr: Data?
     public var code: Int32

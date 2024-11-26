@@ -1,6 +1,6 @@
 import NIOCore
 
-public enum SensorReadError: Error, Hashable, Codable, CustomStringConvertible {
+public enum SensorReadError: Error, Hashable, Sendable, Codable, CustomStringConvertible {
     case invalidIPMIResponse
     case sensorIsInaccessible
     
