@@ -2,7 +2,6 @@ import NIOPosix
 import ArgumentParser
 import IPMITool
 
-@main
 public struct SensorsEnable: AsyncParsableCommand {
     public static let configuration = CommandConfiguration(
         commandName: "enable",

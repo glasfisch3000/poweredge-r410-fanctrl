@@ -1,6 +1,5 @@
 import ArgumentParser
 
-@main
 public struct Sensors: AsyncParsableCommand {
     public static let configuration = CommandConfiguration(
         commandName: "sensors",
