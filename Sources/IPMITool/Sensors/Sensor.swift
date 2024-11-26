@@ -1,7 +1,9 @@
-public enum Sensor: UInt8, Hashable, CustomStringConvertible {
+public enum Sensor: UInt8, Hashable, CaseIterable {
     case ambientTemperature = 0x0E
     case planarTemperature = 0x0F
-    
+}
+
+extension Sensor: CustomStringConvertible {
     public var description: String {
         switch self {
         case .ambientTemperature: "Ambient Temperature"

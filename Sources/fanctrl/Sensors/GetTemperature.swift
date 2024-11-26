@@ -5,7 +5,7 @@ import IPMITool
 public struct GetTemperature: AsyncParsableCommand {
     public static let configuration = CommandConfiguration(
         commandName: "gettemp",
-        abstract: "Get readings from temperature sensors",
+        abstract: "Get readings from temperature sensors.",
         version: "0.0.0",
         shouldDisplay: true,
         subcommands: [],

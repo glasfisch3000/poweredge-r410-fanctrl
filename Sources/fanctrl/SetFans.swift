@@ -5,7 +5,7 @@ import IPMITool
 public struct SetFans: AsyncParsableCommand {
     public static var configuration = CommandConfiguration(
         commandName: "setfans",
-        abstract: "Set the overall fan usage",
+        abstract: "Set the overall fan usage.",
         version: "1.0.0",
         shouldDisplay: true,
         subcommands: [],
