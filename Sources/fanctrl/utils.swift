@@ -5,7 +5,7 @@ internal var standardError: FileHandle {
     set { }
 }
 
-extension FileHandle: TextOutputStream {
+extension FileHandle: @retroactive TextOutputStream {
     public func write(_ string: String) {
         let data = Data(string.utf8)
         self.write(data)

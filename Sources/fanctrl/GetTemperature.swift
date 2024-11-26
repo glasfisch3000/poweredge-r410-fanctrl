@@ -15,69 +15,61 @@ public struct GetTemperature: AsyncParsableCommand {
         aliases: []
     )
     
-    public static var knownSensors: [UInt8: String] = [
-        0x0E: "Ambient Temperature",
-        0x0F: "Planar Temperature",
-    ]
+    public static let defaultSensors: [Sensor] = [.ambientTemperature, .planarTemperature]
     
     public init() { }
     
-    @Option(name: .customLong("sensors", withSingleDash: false), completion: .none, transform: { input in
-        guard let match = input.wholeMatch(of: /(0x)?(?<number>[0-9A-Fa-f]{2})/) else {
-            throw ValidationError("invalid sensor ID: \"\(input)\"")
-        }
-        guard let sensorID = UInt8(match.output.number) else {
-            throw ValidationError("invalid sensor ID: \"(input)\"")
-        }
-        return sensorID
-    }) public var sensorIDs: [UInt8] = []
+    @Option(name: .customLong("sensors"), completion: .none)
+    public var sensors: [Sensor] = []
     
     public mutating func run() async throws {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
-        defer { try? eventLoopGroup.syncShutdownGracefully() }
-        
-        let sensors: [UInt8: String?] = if !sensorIDs.isEmpty {
-            Dictionary(sensorIDs.map { ($0, Self.knownSensors[$0]) }) { $0 ?? $1 ?? nil } // sort sensor ids, assign names if known
-        } else {
-            Self.knownSensors
+        defer {
+            eventLoopGroup.shutdownGracefully { error in
+                // if an error occurs, print it
+                error.flatMap { print($0, to: &standardError) }
+            }
         }
         
-        let tasks = sensors.sorted(by: { $0.key < $1.key }).map { sensorID, sensorName in
+        let sensors = self.sensors.isEmpty ? Self.defaultSensors : self.sensors
+        
+        let tasks = sensors.sorted().map { sensor in
             let task = Task {
-                try await sensor_read(sensorID, on: eventLoopGroup.next()).temperatureReading()
+                try await sensor.read(on: eventLoopGroup.next())
             }
-            return (sensorID, sensorName, task)
+            return (sensor, task)
         }
         
-        for (sensorID, sensorName, task) in tasks {
-            let header = if let sensorName = sensorName {
-                "0x\(String(format: "%02X", sensorID)) (\(sensorName)):"
-            } else {
-                "0x\(String(format: "%02X", sensorID)):"
-            }
+        for (sensor, task) in tasks {
+            print("0x\(String(format: "%02X", sensor.rawValue)) (\(sensor.description)):", terminator: " ")
             
-            let value = switch await task.result {
-            case .success(.some(let temperature)): "\(temperature)°C"
-            case .success(.none): "sensor is disabled"
-            case .failure(let error as SensorReadError):
-                switch error {
-                case .invalidIPMIResponse: "invalid IPMI response"
-                case .sensorIsInaccessible: "sensor is inaccessible or missing"
+            do {
+                if let temp = try await task.value.temperatureReading() {
+                    print("\(temp)°C")
+                } else {
+                    print("sensor is disabled")
                 }
-            case .failure(let error as ShellError):
+            } catch let error as SensorReadError {
                 switch error {
-                case .missingStdout, .missingStderr: "missing IPMI response"
-                case .unableToReadStdout, .unableToReadStderr: "unable to read IPMI response"
+                case .invalidIPMIResponse: print("invalid IPMI response")
+                case .sensorIsInaccessible: print("sensor is inaccessible or missing")
                 }
-            case .failure(let error as ShellCommandFailure):
+            } catch let error as ShellError {
+                switch error {
+                case .missingStdout, .missingStderr: print("missing IPMI response")
+                case .unableToReadStdout, .unableToReadStderr: print("unable to read IPMI response")
+                }
+            } catch let error as ShellCommandFailure {
                 if let stderr = error.stderr {
-                    print(stderr, to: &standardError)
+                    print(stderr)
+                } else if error.uncaughtSignal {
+                    print("ipmitool exited with uncaught signal")
+                } else {
+                    print("ipmitool exited with code \(error.exitCode)")
                 }
-                throw error
-            case .failure(let error): error.localizedDescription
+            } catch {
+                print(error.localizedDescription)
             }
-            
-            print("\(header) \(value)")
         }
     }
 }
