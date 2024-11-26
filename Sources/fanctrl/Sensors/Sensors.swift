@@ -5,7 +5,7 @@ public struct Sensors: AsyncParsableCommand {
         commandName: "sensors",
         version: "0.0.0",
         shouldDisplay: true,
-        subcommands: [GetTemperature.self],
+        subcommands: [GetTemperature.self, SensorsEnable.self],
         groupedSubcommands: [],
         defaultSubcommand: nil,
         helpNames: .shortAndLong,
